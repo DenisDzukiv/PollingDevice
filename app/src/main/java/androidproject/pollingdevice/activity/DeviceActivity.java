@@ -12,12 +12,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import androidproject.pollingdevice.R;
@@ -26,58 +28,82 @@ import androidproject.pollingdevice.dataBase.DB;
 import androidproject.pollingdevice.dataBase.DBHelper;
 
 
-public class DeviceActivity extends AppCompatActivity {
+public class DeviceActivity extends AppCompatActivity implements View.OnClickListener {
     Button btnAdd, btnDel, btnEdit;
     EditText etName;
     DB db;
-    Cursor cursor, cursorCharacteristics, cursorAllCharacteristics;
-    SimpleCursorAdapter scAdapter;
-    Spinner spType;
+    Cursor cursor, cursorCharacteristics, cursorAllCharacteristics, cursorBit;
+    SimpleCursorAdapter scAdapter, scAdapterBit;
+    Spinner spType, spBit;
     final String LOG_TAG = "myLogs";
     LinearLayout linearLayoutEditText;
+    List<EditTextDevice> param = new ArrayList<>();
+    List<Integer> characteristicsId = new LinkedList<>();
+    EditTextDevice et;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
+
+        btnAdd = (Button) findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(this);
+
         spType = (Spinner) findViewById(R.id.spinner);
+        spBit = (Spinner) findViewById(R.id.spBit);
         db = new DB(this);
         db.dbOpen();
         cursor = db.getType();
-        logCursor(cursor);
         String[] from = new String[]{DBHelper.TYPE_NAME, DBHelper.ID};
-        scAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor, from, new int[]{android.R.id.text1, android.R.id.text2});
-        scAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        int[] to = new int[]{R.id.text, R.id.id};
+        scAdapter = new SimpleCursorAdapter(this, R.layout.item_type_spinner, cursor, from, to /*new int[]{android.R.id.text1, android.R.id.text2}*/    );
+        scAdapter.setDropDownViewResource(R.layout.item_type_spinner);
         spType.setAdapter(scAdapter);
+
+        cursorBit = db.getBit();
+        String[] fromBit = new String[]{DBHelper.CHBIT_NAME, DBHelper.ID};
+        int[] toBit = new int[]{R.id.textBit, R.id.idBit};
+        scAdapterBit = new SimpleCursorAdapter(this, R.layout.item_bit, cursorBit, fromBit, toBit);
+        spBit.setAdapter(scAdapterBit);
+        spBit.setSelection(2);
         db.dbClose();
         //spType.setPrompt("Вид оборудования");
+
 
         spType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
                 // показываем позиция нажатого элемента
-                db = new DB(DeviceActivity.this);
+//                db = new DB(DeviceActivity.this);
                 db.dbOpen();
-                //cursorCharacteristics = db.getCharacteristics(spType.getSelectedItemId());
-                cursorAllCharacteristics = db.getAllCharacteristics();
-                logCursor(cursorAllCharacteristics);
-                createEditTextView(cursorAllCharacteristics);
+                cursorCharacteristics = db.getCharacteristics(spType.getSelectedItemId());
+               /* String[] from = new String[] {DBHelper.ID, DBHelper.CH_NAME};
+                int[] to = new int[] {R.id.tvId, R.id.edParam};
 
-                cursorAllCharacteristics.close();
+                scAdapter = new SimpleCursorAdapter(DeviceActivity.this, R.layout.layer_param, cursorCharacteristics, from, to);
+                lvDevice = (ListView) findViewById(R.id.lvDevice);
+                lvDevice.setAdapter(scAdapter);*/
+
+                //cursorAllCharacteristics = db.getAllCharacteristics();
+                //logCursor(cursorAllCharacteristics);
+
+                createEditTextView(cursorCharacteristics);
+                cursorCharacteristics.close();
                 db.dbClose();
-                Log.d(LOG_TAG, "11l");
-
-
                 //linearLayoutEditText = (LinearLayout) findViewById(R.id.EditText);
-
-                // создание полей для параметров
-
-                //Toast.makeText(getBaseContext(), "Position = " + cursorCharacteristics.getCount(), Toast.LENGTH_SHORT).show();
-
-
             }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+
+        spBit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+            }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
@@ -86,58 +112,47 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     void createEditTextView(Cursor cursor) {
-        Log.d(LOG_TAG, "----- 333 ----");
         if (cursor != null) {
-            /*etType = (EditText) findViewById(R.id.etNe);
-            etType.setVisibility(View.GONE);*/
-            /*if (cursor.moveToFirst()) {
-                int idIndex = cursor.getColumnIndex(DBHelper.ID);
-                int nameIndex = cursor.getColumnIndex(DBHelper.CH_NAME);
-                do {
-
-                    EditText et = new EditText(DeviceActivity.this);
-                    et.setLayoutParams(lEditParams);
-                    et.setId(cursor.getInt(idIndex));
-
-                    et.setHint(cursor.getString(nameIndex));
-
-                    linearLayoutEditText.addView(et);
-                    Log.d(LOG_TAG, "----- cursor.getString(nameIndex) ----");
-                } while (cursor.moveToNext());
-            } else Log.d(LOG_TAG, "Cursor is null");
-            */
-
-
             linearLayoutEditText = (LinearLayout) findViewById(R.id.EditText);
+            linearLayoutEditText.removeAllViews();
             LinearLayout.LayoutParams lEditParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
             if (cursor.moveToFirst()) {
                 int idIndex = cursor.getColumnIndex(DBHelper.ID);
                 int nameIndex = cursor.getColumnIndex(DBHelper.CH_NAME);
+                spBit = (Spinner) findViewById(R.id.spBit);
+                spBit.setVisibility(View.GONE);
+                characteristicsId.clear();
+                param.clear();
+
                 do {
-                    EditTextDevice et = new EditTextDevice(DeviceActivity.this);
-                    et.setLayoutParams(lEditParams);
-                    et.setHint(cursor.getString(nameIndex));
-                    et.setId(cursor.getInt(idIndex));
-                    linearLayoutEditText.addView(et);
-                    Log.d(LOG_TAG, "----- cursor.getString(nameIndex) ----");
+                    characteristicsId.add(cursor.getInt(idIndex));
+                    if(cursor.getInt(idIndex) == 6) {
+                        spBit.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        et = new EditTextDevice(DeviceActivity.this);
+                        et.setLayoutParams(lEditParams);
+                        et.setHint(cursor.getString(nameIndex));
+                        et.setId(cursor.getInt(idIndex));
+                        linearLayoutEditText.addView(et);
+                        param.add(et);
+                    }
+
                 } while (cursor.moveToNext());
             } else Log.d(LOG_TAG, "Cursor is null");
         }
     }
 
-    void logCursor(Cursor cursor) {
-        Log.d(LOG_TAG, "----- logCursor1 ----");
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                String str;
-                do {
-                    str = "";
-                    for (String cn : cursor.getColumnNames())
-                        str = str.concat(cn + " = " + cursor.getString(cursor.getColumnIndex(cn)) + "; ");
-                    Log.d(LOG_TAG, str);
-                } while (cursor.moveToNext());
-            } else Log.d(LOG_TAG, "Cursor is null");
+    @Override
+    public void onClick(View v) {
+        etName = (EditText) findViewById(R.id.etName);
+        spType = (Spinner) findViewById(R.id.spinner);
+        for(EditTextDevice ett:param){
+            if (ett.getText().length() == 0){
+                Log.d(LOG_TAG, "is null");
+            }
+
         }
     }
 }

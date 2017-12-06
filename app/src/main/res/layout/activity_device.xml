@@ -16,12 +16,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"></Spinner>
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Характеристики"
+        android:textSize="20sp"
+        android:visibility="visible"></TextView>
+
+
+
+
+
     <LinearLayout
+        android:id="@+id/EditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/EditText"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:orientation="vertical"></LinearLayout>
+
+    <!--<ListView
+        android:id="@+id/lvDevice"
+        android:layout_width="match_parent"
+        android:layout_height="390dp"></ListView>-->
+
+    <Spinner
+        android:id="@+id/spBit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"></Spinner>
 
 
     <LinearLayout
@@ -35,7 +58,7 @@
             android:layout_height="wrap_content"
             android:text="Add"></Button>
 
-        <Button
+        <!--<Button
             android:id="@+id/btnRead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,6 +68,6 @@
             android:id="@+id/btnClear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clear"></Button>
+            android:text="Clear"></Button>-->
     </LinearLayout>
 </LinearLayout>

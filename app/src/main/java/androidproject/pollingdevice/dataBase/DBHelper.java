@@ -18,6 +18,9 @@ public class DBHelper extends SQLiteOpenHelper {
     int[] typeCharacter = {1,1,2,3,2,2,3,3,3,3};
     int[] characterType = {1,2,2,2,3,4,5,6,7,8};
 
+    int[] chbit_id = {1,2,3};
+    String[] chbit_name = {"четный", "нечетный", "не задано"};
+
     public static final String ID = "_id";
     public static final String TABLE_TYPE_DEVICE = "TYPE_DEVICE";
     public static final String TYPE_ID = "TYPE_ID";
@@ -35,6 +38,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DEV_NAME = "DEV_NAME";
 
     public static final String CHARACTERISTICS_VALUE = "CHARACTERISTICS_VALUE";
+
+    public static final String CHARACTERISTICS_BIT = "CHARACTERISTICS_BIT";
+    public static final String CHBIT_ID = "CHBIT_ID";
+    public static final String CHBIT_NAME = "CHBIT_NAME";
 
     public DBHelper(Context context, String dbName, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, dbName, null, version);
@@ -54,6 +61,19 @@ public class DBHelper extends SQLiteOpenHelper {
             contentValues.put(TYPE_NAME, typeName[i]);
             sqLiteDatabase.insert("TYPE_DEVICE", null, contentValues);
         }
+
+        Log.d(LOG_TAG, "------Create table CHARACTERISTICS_BIT -------");
+        sqLiteDatabase.execSQL("create table if not exists " + CHARACTERISTICS_BIT + " ("
+                + CHBIT_ID + "  integer primary key, "
+                + CHBIT_NAME + "  text"
+                + ");");
+        for (int i =0; i < chbit_id.length; i++ ) {
+            contentValues.clear();
+            contentValues.put(CHBIT_ID, chbit_id[i]);
+            contentValues.put(CHBIT_NAME, chbit_name[i]);
+            sqLiteDatabase.insert("CHARACTERISTICS_BIT", null, contentValues);
+        }
+
 
         Log.d(LOG_TAG, "------Create table CHARACTERISTICS -------");
         sqLiteDatabase.execSQL("create table if not exists " + CHARACTERISTICS + " ("
@@ -80,6 +100,7 @@ public class DBHelper extends SQLiteOpenHelper {
             contentValues.put(CH_ID, characterType[i]);
             sqLiteDatabase.insert(TYPE_CHARACTERISTICS, null, contentValues);
         }
+
 
         Log.d(LOG_TAG, "------Create table DEVICE -------");
         sqLiteDatabase.execSQL("create table if not exists " + DEVICE + " ("

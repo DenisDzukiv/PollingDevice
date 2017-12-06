@@ -39,6 +39,14 @@ public class DB {
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
 
+
+    public Cursor getBit(){
+        String sqlQuery = "select T." + dbHelper.CHBIT_NAME + " , T." + dbHelper.CHBIT_ID + " as _id "
+                + " from "+ dbHelper.CHARACTERISTICS_BIT +" as T ";
+
+        return sqLiteDatabase.rawQuery(sqlQuery, null);
+    }
+
     public Cursor getAllCharacteristics(){
         String sqlQuery = "select T." + dbHelper.CH_NAME + " , T." + dbHelper.CH_ID + " as _id "
                 + " from "+ dbHelper.CHARACTERISTICS +" as T ";
@@ -68,7 +76,8 @@ public class DB {
                 + " from "+ dbHelper.TYPE_CHARACTERISTICS +" as TC "
                 + " INNER JOIN "+ dbHelper.TABLE_TYPE_DEVICE +" as T ON TC."+ dbHelper.TYPE_ID +" = T."+ dbHelper.TYPE_ID
                 + " INNER JOIN "+ dbHelper.CHARACTERISTICS + " as C ON TC."+dbHelper.CH_ID+" = C."+dbHelper.CH_ID
-                + " where T." + dbHelper.TYPE_ID + " = " + id;
+                + " where T." + dbHelper.TYPE_ID + " = " + id
+                + " order by C." + dbHelper.CH_ID;
 
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
