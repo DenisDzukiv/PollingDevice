@@ -18,21 +18,27 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import androidproject.pollingdevice.R;
+import androidproject.pollingdevice.Service.ServiceDevice;
+import androidproject.pollingdevice.Validation.Validation;
 import androidproject.pollingdevice.View.EditTextDevice;
 import androidproject.pollingdevice.dataBase.DB;
 import androidproject.pollingdevice.dataBase.DBHelper;
+import androidproject.pollingdevice.model.Characteristics;
+import androidproject.pollingdevice.model.Device;
 
 
 public class DeviceActivity extends AppCompatActivity implements View.OnClickListener {
     Button btnAdd, btnDel, btnEdit;
     EditText etName;
     DB db;
-    Cursor cursor, cursorCharacteristics, cursorAllCharacteristics, cursorBit;
+    Cursor cursor, cursorCharacteristics, cursorBit;
     SimpleCursorAdapter scAdapter, scAdapterBit;
     Spinner spType, spBit;
     final String LOG_TAG = "myLogs";
@@ -40,6 +46,8 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
     List<EditTextDevice> param = new ArrayList<>();
     List<Integer> characteristicsId = new LinkedList<>();
     EditTextDevice et;
+    final long chIdBit = 6;
+    String bitName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,7 +74,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         scAdapterBit = new SimpleCursorAdapter(this, R.layout.item_bit, cursorBit, fromBit, toBit);
         spBit.setAdapter(scAdapterBit);
         spBit.setSelection(2);
-        db.dbClose();
+
         //spType.setPrompt("Вид оборудования");
 
 
@@ -90,8 +98,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
 
                 createEditTextView(cursorCharacteristics);
                 cursorCharacteristics.close();
-                db.dbClose();
-                //linearLayoutEditText = (LinearLayout) findViewById(R.id.EditText);
+                //db.dbClose();
             }
 
             @Override
@@ -103,6 +110,8 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
+                TextView tv = (TextView) view.findViewById(R.id.text);
+                bitName = tv.getText().toString();
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
@@ -116,7 +125,6 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
             linearLayoutEditText = (LinearLayout) findViewById(R.id.EditText);
             linearLayoutEditText.removeAllViews();
             LinearLayout.LayoutParams lEditParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
             if (cursor.moveToFirst()) {
                 int idIndex = cursor.getColumnIndex(DBHelper.ID);
                 int nameIndex = cursor.getColumnIndex(DBHelper.CH_NAME);
@@ -124,10 +132,9 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
                 spBit.setVisibility(View.GONE);
                 characteristicsId.clear();
                 param.clear();
-
                 do {
                     characteristicsId.add(cursor.getInt(idIndex));
-                    if(cursor.getInt(idIndex) == 6) {
+                    if(cursor.getInt(idIndex) == chIdBit) {
                         spBit.setVisibility(View.VISIBLE);
                     }
                     else {
@@ -138,7 +145,6 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
                         linearLayoutEditText.addView(et);
                         param.add(et);
                     }
-
                 } while (cursor.moveToNext());
             } else Log.d(LOG_TAG, "Cursor is null");
         }
@@ -146,13 +152,37 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        etName = (EditText) findViewById(R.id.etName);
-        spType = (Spinner) findViewById(R.id.spinner);
-        for(EditTextDevice ett:param){
-            if (ett.getText().length() == 0){
-                Log.d(LOG_TAG, "is null");
-            }
+        Characteristics characteristics = new Characteristics();
+        List<Characteristics> characteristicsList = new ArrayList<>();
+        Device device = new Device();
 
+        etName = (EditText) findViewById(R.id.etName);
+        device.setDevName(etName.getText().toString());
+
+        spType = (Spinner) findViewById(R.id.spinner);
+        device.setTypeId(spType.getSelectedItemId());
+
+        characteristics.setChId(chIdBit);
+        characteristics.setChValue(bitName);
+
+        for(EditTextDevice ett:param){
+                characteristics.setChId(ett.getId());
+                characteristics.setChValue(ett.getText().toString());
+                characteristicsList.add(characteristics);
         }
+        device.setCharacteristicsList(characteristicsList);
+        if (!Validation.validDevice(device)){
+            Toast.makeText(getBaseContext(), "Данные введены не корректно", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this);
+            serviceDevice.save(device);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        db.dbClose();
     }
 }

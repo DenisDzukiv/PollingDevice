@@ -25,31 +25,31 @@ public class DB {
     public void dbOpen(){
         dbHelper = new DBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
         sqLiteDatabase = dbHelper.getWritableDatabase();
-
     }
 
     public void dbClose (){
-        dbHelper = new DBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDatabase.close();
+        //DBHelper = new DBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     public Cursor getType(){
-        String sqlQuery = "select T." + dbHelper.TYPE_NAME + " , T." + dbHelper.TYPE_ID + " as _id "
-                + " from "+ dbHelper.TABLE_TYPE_DEVICE +" as T ";
+        String sqlQuery = "select T." + DBHelper.TYPE_NAME + " , T." + DBHelper.TYPE_ID + " as _id "
+                + " from "+ DBHelper.TABLE_TYPE_DEVICE +" as T ";
 
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
 
 
     public Cursor getBit(){
-        String sqlQuery = "select T." + dbHelper.CHBIT_NAME + " , T." + dbHelper.CHBIT_ID + " as _id "
-                + " from "+ dbHelper.CHARACTERISTICS_BIT +" as T ";
+        String sqlQuery = "select T." + DBHelper.CHBIT_NAME + " , T." + DBHelper.CHBIT_ID + " as _id "
+                + " from "+ DBHelper.CHARACTERISTICS_BIT +" as T ";
 
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
 
     public Cursor getAllCharacteristics(){
-        String sqlQuery = "select T." + dbHelper.CH_NAME + " , T." + dbHelper.CH_ID + " as _id "
-                + " from "+ dbHelper.CHARACTERISTICS +" as T ";
+        String sqlQuery = "select T." + DBHelper.CH_NAME + " , T." + DBHelper.CH_ID + " as _id "
+                + " from "+ DBHelper.CHARACTERISTICS +" as T ";
 
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
@@ -60,24 +60,14 @@ public class DB {
     }
 
 
-   /* public Cursor getCharacteristics(){
-        Log.d("myLog", "----- logCursor2  ----");
-        String sqlQuery = "select T." + dbHelper.TYPE_NAME + " , C." + dbHelper.CH_NAME + ", C." + dbHelper.CH_ID + " as _id "
-                + " from "+ dbHelper.TYPE_CHARACTERISTICS +" as TC "
-                + " INNER JOIN "+ dbHelper.TABLE_TYPE_DEVICE +" as T ON TC."+ dbHelper.TYPE_ID +" = T."+ dbHelper.TYPE_ID
-                + " INNER JOIN "+ dbHelper.CHARACTERISTICS + " as C ON TC."+dbHelper.CH_ID+" = C."+dbHelper.CH_ID;
-
-        return sqLiteDatabase.rawQuery(sqlQuery, null);
-    }*/
-
     public Cursor getCharacteristics(long id){
         Log.d("myLog", "----- logCursor2  ----");
-        String sqlQuery = "select T." + dbHelper.TYPE_NAME + " , C." + dbHelper.CH_NAME + ", C." + dbHelper.CH_ID + " as _id "
-                + " from "+ dbHelper.TYPE_CHARACTERISTICS +" as TC "
-                + " INNER JOIN "+ dbHelper.TABLE_TYPE_DEVICE +" as T ON TC."+ dbHelper.TYPE_ID +" = T."+ dbHelper.TYPE_ID
-                + " INNER JOIN "+ dbHelper.CHARACTERISTICS + " as C ON TC."+dbHelper.CH_ID+" = C."+dbHelper.CH_ID
-                + " where T." + dbHelper.TYPE_ID + " = " + id
-                + " order by C." + dbHelper.CH_ID;
+        String sqlQuery = "select T." + DBHelper.TYPE_NAME + " , C." + DBHelper.CH_NAME + ", C." + DBHelper.CH_ID + " as _id "
+                + " from "+ DBHelper.TYPE_CHARACTERISTICS +" as TC "
+                + " INNER JOIN "+ DBHelper.TABLE_TYPE_DEVICE +" as T ON TC."+ DBHelper.TYPE_ID +" = T."+ DBHelper.TYPE_ID
+                + " INNER JOIN "+ DBHelper.CHARACTERISTICS + " as C ON TC."+DBHelper.CH_ID+" = C."+DBHelper.CH_ID
+                + " where T." + DBHelper.TYPE_ID + " = " + id
+                + " order by C." + DBHelper.CH_ID;
 
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
