@@ -39,6 +39,7 @@ import androidproject.pollingdevice.model.Device;
 public class DeviceActivity extends AppCompatActivity implements View.OnClickListener {
     Button btnAdd, btnDel, btnEdit;
     EditText etName;
+    TextView tv;
     DB db;
     Cursor cursor, cursorCharacteristics, cursorBit, cursorDevice;
     SimpleCursorAdapter scAdapter, scAdapterBit;
@@ -49,7 +50,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
     List<Integer> characteristicsId = new LinkedList<>();
     EditTextDevice et;
     final long chIdBit = 6;
-    String bitName;
+    String bitName, nameBit;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,32 +72,20 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         spType.setAdapter(scAdapter);
 
         cursorBit = db.getBit();
+        logCursor(cursorBit);
         String[] fromBit = new String[]{DBHelper.CHBIT_NAME, DBHelper.ID};
         int[] toBit = new int[]{R.id.textBit, R.id.idBit};
         scAdapterBit = new SimpleCursorAdapter(this, R.layout.item_bit, cursorBit, fromBit, toBit);
         spBit.setAdapter(scAdapterBit);
         spBit.setSelection(2);
+        Log.d(LOG_TAG, "2 = " );
         spType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                // показываем позиция нажатого элемента
-//                db = new DB(DeviceActivity.this);
-                db.dbOpen();
                 cursorCharacteristics = db.getCharacteristics(spType.getSelectedItemId());
-               /* String[] from = new String[] {DBHelper.ID, DBHelper.CH_NAME};
-                int[] to = new int[] {R.id.tvId, R.id.edParam};
-
-                scAdapter = new SimpleCursorAdapter(DeviceActivity.this, R.layout.layer_param, cursorCharacteristics, from, to);
-                lvDevice = (ListView) findViewById(R.id.lvDevice);
-                lvDevice.setAdapter(scAdapter);*/
-
-                //cursorAllCharacteristics = db.getAllCharacteristics();
-                //logCursor(cursorAllCharacteristics);
-
                 createEditTextView(cursorCharacteristics);
                 cursorCharacteristics.close();
-                //db.dbClose();
             }
 
             @Override
@@ -108,8 +97,8 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                TextView tv = (TextView) view.findViewById(R.id.text);
-                bitName = tv.getText().toString();
+                tv = (TextView) view.findViewById(R.id.textBit);
+                bitName = String.valueOf(tv.getText());
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
@@ -122,6 +111,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         if (cursor != null) {
             linearLayoutEditText = (LinearLayout) findViewById(R.id.EditText);
             linearLayoutEditText.removeAllViews();
+
             LinearLayout.LayoutParams lEditParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             if (cursor.moveToFirst()) {
                 int idIndex = cursor.getColumnIndex(DBHelper.ID);
@@ -130,10 +120,12 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
                 spBit.setVisibility(View.GONE);
                 characteristicsId.clear();
                 param.clear();
+                nameBit = null;
                 do {
                     characteristicsId.add(cursor.getInt(idIndex));
                     if(cursor.getInt(idIndex) == chIdBit) {
                         spBit.setVisibility(View.VISIBLE);
+                        nameBit = bitName;
                     }
                     else {
                         et = new EditTextDevice(DeviceActivity.this);
@@ -150,7 +142,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        Characteristics characteristics = new Characteristics();
+        Characteristics characteristics;
         List<Characteristics> characteristicsList = new ArrayList<>();
         Device device = new Device();
         ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this);
@@ -161,10 +153,15 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         spType = (Spinner) findViewById(R.id.spinner);
         device.setTypeId(spType.getSelectedItemId());
 
-        characteristics.setChId(chIdBit);
-        characteristics.setChValue(bitName);
-
+        if( nameBit.length() != 0) {
+            characteristics = new Characteristics();
+            characteristics.setChId(chIdBit);
+            characteristics.setChValue(bitName);
+            characteristicsList.add(characteristics);
+        }
+        Log.d(LOG_TAG, "bitName = " + bitName.length());
         for(EditTextDevice ett:param){
+                characteristics = new Characteristics();
                 characteristics.setChId(ett.getId());
                 characteristics.setChValue(ett.getText().toString());
                 characteristicsList.add(characteristics);
@@ -176,17 +173,11 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         else{
             serviceDevice.save(device);
             cursor = serviceDevice.getCharValue();
-            logCursor(cursor);
-            cursor.close();
-            cursorDevice = serviceDevice.getDev();
-            logCursor(cursorDevice);
             cursor.close();
             Toast.makeText(getBaseContext(), "Устройство добавлено", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(DeviceActivity.this, MainActivity.class);
             startActivity(intent);
         }
-
-
     }
 
     void logCursor(Cursor cursor){

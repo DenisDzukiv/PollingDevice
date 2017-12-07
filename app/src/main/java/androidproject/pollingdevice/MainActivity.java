@@ -34,9 +34,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lvMain = (ListView) findViewById(R.id.lvMain);
-        serviceDevice = new ServiceDevice(this);
+       /* serviceDevice = new ServiceDevice(this);
         serviceDevice.dbOpen();
-        cursor =
+        cursor = */
+         db = new DB(this);
+         db.dbOpen();
         //db.drop_database();
         cursor = db.getType();
         logCursor(cursor);

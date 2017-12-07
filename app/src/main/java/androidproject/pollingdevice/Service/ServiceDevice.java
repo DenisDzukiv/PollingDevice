@@ -30,6 +30,7 @@ public class ServiceDevice implements DaoDevice{
 
     public void dbOpen(){
         dbHelper = new DBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
+        sqLiteDatabase = dbHelper.getWritableDatabase();
     }
 
     public void dbClose (){
@@ -40,8 +41,11 @@ public class ServiceDevice implements DaoDevice{
 
     @Override
     public void save(Device device) {
+        for(Characteristics c1:device.getCharacteristicsList()) {
+            Log.d(LOG_TAG, "iddddd=" + String.valueOf(c1.getChId()) + " = " + c1.getChValue());
+        }
         dbOpen();
-        sqLiteDatabase = dbHelper.getWritableDatabase();
+        //sqLiteDatabase = dbHelper.getWritableDatabase();
         sqLiteDatabase.beginTransaction();
         try {
             long lastId;
@@ -50,10 +54,11 @@ public class ServiceDevice implements DaoDevice{
             contentValuesDev.put(DBHelper.DEV_NAME, device.getDevName());
             contentValuesDev.put(DBHelper.TYPE_ID, device.getTypeId());
             lastId = sqLiteDatabase.insert(DBHelper.DEVICE, null, contentValuesDev);
-            Log.d(LOG_TAG, "lasdId=" + String.valueOf(lastId));
+
             contentCharacteristics = new ContentValues();
             contentCharacteristics.clear();
             for (Characteristics ct:device.getCharacteristicsList()){
+                //Log.d(LOG_TAG, "iddddd=" + String.valueOf(ct.getChId()) + " = " + ct.getChValue());
                 contentCharacteristics.put(DBHelper.DEV_ID, lastId);
                 contentCharacteristics.put(DBHelper.CH_ID, ct.getChId());
                 contentCharacteristics.put(DBHelper.CH_VALUE, ct.getChValue());
@@ -74,12 +79,17 @@ public class ServiceDevice implements DaoDevice{
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
 
-    public Cursor getAllDevice(){
+    /*public Cursor getAllDevice(){
         String sqlQuery = "select T." + DBHelper.DEV_ID  + " as _id " + " , T." + DBHelper.DEV_NAME  + ", T." + DBHelper.TYPE_ID
-                + " from "+ DBHelper.DEVICE +" as T ";
+                + " from "+ DBHelper.DEVICE +" as T "
+                + " INNER JOIN " + DBHelper.TABLE_TYPE_DEVICE + " as TD ON TD." + DBHelper.TYPE_ID + " = T."+ DBHelper.TYPE_ID
+                + " INNER JOIN " + DBHelper.CHARACTERISTICS_VALUE + " as CV ON CV." +
+
+                + " INNER JOIN "+ DBHelper.TABLE_TYPE_DEVICE +" as T ON TC."+ DBHelper.TYPE_ID +" = T."+ DBHelper.TYPE_ID
+                ;
 
         return sqLiteDatabase.rawQuery(sqlQuery, null);
-    }
+    }*/
 
 
 }
