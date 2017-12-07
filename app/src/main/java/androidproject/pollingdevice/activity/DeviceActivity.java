@@ -1,6 +1,7 @@
 package androidproject.pollingdevice.activity;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import androidproject.pollingdevice.MainActivity;
 import androidproject.pollingdevice.R;
 import androidproject.pollingdevice.Service.ServiceDevice;
 import androidproject.pollingdevice.Validation.Validation;
@@ -38,7 +40,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
     Button btnAdd, btnDel, btnEdit;
     EditText etName;
     DB db;
-    Cursor cursor, cursorCharacteristics, cursorBit;
+    Cursor cursor, cursorCharacteristics, cursorBit, cursorDevice;
     SimpleCursorAdapter scAdapter, scAdapterBit;
     Spinner spType, spBit;
     final String LOG_TAG = "myLogs";
@@ -64,7 +66,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         cursor = db.getType();
         String[] from = new String[]{DBHelper.TYPE_NAME, DBHelper.ID};
         int[] to = new int[]{R.id.text, R.id.id};
-        scAdapter = new SimpleCursorAdapter(this, R.layout.item_type_spinner, cursor, from, to /*new int[]{android.R.id.text1, android.R.id.text2}*/    );
+        scAdapter = new SimpleCursorAdapter(this, R.layout.item_type_spinner, cursor, from, to );
         scAdapter.setDropDownViewResource(R.layout.item_type_spinner);
         spType.setAdapter(scAdapter);
 
@@ -74,10 +76,6 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         scAdapterBit = new SimpleCursorAdapter(this, R.layout.item_bit, cursorBit, fromBit, toBit);
         spBit.setAdapter(scAdapterBit);
         spBit.setSelection(2);
-
-        //spType.setPrompt("Вид оборудования");
-
-
         spType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -155,6 +153,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         Characteristics characteristics = new Characteristics();
         List<Characteristics> characteristicsList = new ArrayList<>();
         Device device = new Device();
+        ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this);
 
         etName = (EditText) findViewById(R.id.etName);
         device.setDevName(etName.getText().toString());
@@ -175,8 +174,33 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
             Toast.makeText(getBaseContext(), "Данные введены не корректно", Toast.LENGTH_SHORT).show();
         }
         else{
-            ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this);
             serviceDevice.save(device);
+            cursor = serviceDevice.getCharValue();
+            logCursor(cursor);
+            cursor.close();
+            cursorDevice = serviceDevice.getDev();
+            logCursor(cursorDevice);
+            cursor.close();
+            Toast.makeText(getBaseContext(), "Устройство добавлено", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DeviceActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
+
+
+    }
+
+    void logCursor(Cursor cursor){
+        Log.d(LOG_TAG, "----- logCursor3  ----");
+        if(cursor != null) {
+            if(cursor.moveToFirst()){
+                String str;
+                do{
+                    str = "";
+                    for (String cn:cursor.getColumnNames())
+                        str = str.concat(cn + " = " + cursor.getString(cursor.getColumnIndex(cn)) + "; ");
+                    Log.d(LOG_TAG, str);
+                } while (cursor.moveToNext());
+            } else Log.d(LOG_TAG, "Cursor is null");
         }
     }
 

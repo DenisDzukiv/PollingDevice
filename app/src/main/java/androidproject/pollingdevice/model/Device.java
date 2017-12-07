@@ -7,6 +7,7 @@ public class Device {
     private String devName;
     private long typeId;
     private List<Characteristics> characteristicsList;
+
     public Device(){}
 
     public Device(long devId, String devName, long typeId, List<Characteristics> characteristicsList){

@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import androidproject.pollingdevice.Service.ServiceDevice;
 import androidproject.pollingdevice.activity.DeviceActivity;
 import androidproject.pollingdevice.dataBase.DB;
 import androidproject.pollingdevice.dataBase.DBHelper;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     ListView lvMain;
     SimpleCursorAdapter scAdapter;
     Cursor cursor;
+    ServiceDevice serviceDevice;
     DB db;
 
     @Override
@@ -32,8 +34,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lvMain = (ListView) findViewById(R.id.lvMain);
-        db = new DB(this);
-        db.dbOpen();
+        serviceDevice = new ServiceDevice(this);
+        serviceDevice.dbOpen();
+        cursor =
         //db.drop_database();
         cursor = db.getType();
         logCursor(cursor);

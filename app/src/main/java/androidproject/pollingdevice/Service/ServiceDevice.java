@@ -42,52 +42,44 @@ public class ServiceDevice implements DaoDevice{
     public void save(Device device) {
         dbOpen();
         sqLiteDatabase = dbHelper.getWritableDatabase();
-        Log.d(LOG_TAG, "1");
-        //sqLiteDatabase.beginTransaction();
-        Log.d(LOG_TAG, "2");
-       /* try {*/
-            long lasdId;
+        sqLiteDatabase.beginTransaction();
+        try {
+            long lastId;
             contentValuesDev = new ContentValues();
             contentValuesDev.clear();
             contentValuesDev.put(DBHelper.DEV_NAME, device.getDevName());
             contentValuesDev.put(DBHelper.TYPE_ID, device.getTypeId());
-            lasdId = sqLiteDatabase.insert(DBHelper.DEVICE, null, contentValuesDev);
-            Log.d(LOG_TAG, "lasdId" + String.valueOf(lasdId));
+            lastId = sqLiteDatabase.insert(DBHelper.DEVICE, null, contentValuesDev);
+            Log.d(LOG_TAG, "lasdId=" + String.valueOf(lastId));
             contentCharacteristics = new ContentValues();
             contentCharacteristics.clear();
             for (Characteristics ct:device.getCharacteristicsList()){
-                contentCharacteristics.put(DBHelper.DEV_ID, lasdId);
+                contentCharacteristics.put(DBHelper.DEV_ID, lastId);
                 contentCharacteristics.put(DBHelper.CH_ID, ct.getChId());
                 contentCharacteristics.put(DBHelper.CH_VALUE, ct.getChValue());
+                sqLiteDatabase.insert(DBHelper.CHARACTERISTICS_VALUE, null, contentCharacteristics);
             }
-            /*sqLiteDatabase.setTransactionSuccessful();
+            sqLiteDatabase.setTransactionSuccessful();
         } finally {
             sqLiteDatabase.endTransaction();
-        }*/
-        dbClose();
-    }
-
-    private long getLastId(){
-        String sqlQuery = "select T." + DBHelper.DEV_ID + " as _id "
-                + " from "+ DBHelper.DEVICE +" as T "
-                + " where rowid = last_insert_rowid()";
-        long devId = Long.parseLong(null);
-        Cursor cursor = sqLiteDatabase.rawQuery(sqlQuery, null);
-        if(cursor != null) {
-            if(cursor.moveToFirst()){
-
-                int idIndex = cursor.getColumnIndex(DBHelper.ID);
-                do{
-                    devId = cursor.getInt(idIndex);
-                } while (cursor.moveToNext());
-            }
         }
-        Log.d(LOG_TAG,"lastId" +  String.valueOf(devId));
-        return devId;
+
     }
 
-    public void drop_database(){
-        mCtx.deleteDatabase(DATABASE_NAME);
-        Log.d("myLog", "----- drop_database  ----");
+    public Cursor getCharValue(){
+        String sqlQuery = "select T." + DBHelper.DEV_ID + " , T." + DBHelper.CH_ID + " as _id " + ", T." + DBHelper.CH_VALUE
+                + " from "+ DBHelper.CHARACTERISTICS_VALUE +" as T "
+                ;
+
+        return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
+
+    public Cursor getAllDevice(){
+        String sqlQuery = "select T." + DBHelper.DEV_ID  + " as _id " + " , T." + DBHelper.DEV_NAME  + ", T." + DBHelper.TYPE_ID
+                + " from "+ DBHelper.DEVICE +" as T ";
+
+        return sqLiteDatabase.rawQuery(sqlQuery, null);
+    }
+
+
 }
