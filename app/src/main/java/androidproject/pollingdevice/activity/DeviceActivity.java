@@ -168,7 +168,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         }
         device.setCharacteristicsList(characteristicsList);
         if (!Validation.validDevice(device)){
-            Toast.makeText(getBaseContext(), "Данные введены не корректно", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), "Данные введены не корректно!", Toast.LENGTH_SHORT).show();
         }
         else{
             serviceDevice.save(device);
