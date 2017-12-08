@@ -24,30 +24,20 @@ public class ServiceDevice implements DaoDevice{
     ContentValues contentValuesDev, contentCharacteristics;
 
 
-    public ServiceDevice(Context ctx) {
+    public ServiceDevice(Context ctx, DBHelper db) {
         mCtx = ctx;
+        dbHelper = db;
     }
 
-    public void dbOpen(){
-        dbHelper = new DBHelper(mCtx, DATABASE_NAME, null, DATABASE_VERSION);
-        sqLiteDatabase = dbHelper.getWritableDatabase();
-    }
-
-    public void dbClose (){
+    public void serviceDbClose (){
         sqLiteDatabase.close();
     }
 
-
-
     @Override
     public void save(Device device) {
-        for(Characteristics c1:device.getCharacteristicsList()) {
-            Log.d(LOG_TAG, "iddddd=" + String.valueOf(c1.getChId()) + " = " + c1.getChValue());
-        }
-        dbOpen();
-        //sqLiteDatabase = dbHelper.getWritableDatabase();
-        sqLiteDatabase.beginTransaction();
+        sqLiteDatabase = dbHelper.getWritableDatabase();
         try {
+            sqLiteDatabase.beginTransaction();
             long lastId;
             contentValuesDev = new ContentValues();
             contentValuesDev.clear();
@@ -58,7 +48,6 @@ public class ServiceDevice implements DaoDevice{
             contentCharacteristics = new ContentValues();
             contentCharacteristics.clear();
             for (Characteristics ct:device.getCharacteristicsList()){
-                //Log.d(LOG_TAG, "iddddd=" + String.valueOf(ct.getChId()) + " = " + ct.getChValue());
                 contentCharacteristics.put(DBHelper.DEV_ID, lastId);
                 contentCharacteristics.put(DBHelper.CH_ID, ct.getChId());
                 contentCharacteristics.put(DBHelper.CH_VALUE, ct.getChValue());
@@ -68,7 +57,6 @@ public class ServiceDevice implements DaoDevice{
         } finally {
             sqLiteDatabase.endTransaction();
         }
-
     }
 
     public Cursor getCharValue(){
@@ -79,14 +67,33 @@ public class ServiceDevice implements DaoDevice{
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }
 
-    /*public Cursor getAllDevice(){
-        String sqlQuery = "select T." + DBHelper.DEV_ID  + " as _id " + " , T." + DBHelper.DEV_NAME  + ", T." + DBHelper.TYPE_ID
-                + " from "+ DBHelper.DEVICE +" as T "
-                + " INNER JOIN " + DBHelper.TABLE_TYPE_DEVICE + " as TD ON TD." + DBHelper.TYPE_ID + " = T."+ DBHelper.TYPE_ID
-                + " INNER JOIN " + DBHelper.CHARACTERISTICS_VALUE + " as CV ON CV." +
+    public Cursor getAllDevice(){
+        String sqlQuery = null;
+        try {
+            sqLiteDatabase = dbHelper.getWritableDatabase();
+            sqlQuery = "select T." + DBHelper.DEV_ID  + " as _id " + " , T." + DBHelper.DEV_NAME  + " , T." + DBHelper.TYPE_ID
+                    + " from "+ DBHelper.DEVICE +" as T "
+                    + " order by T." + DBHelper.DEV_ID;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sqLiteDatabase.rawQuery(sqlQuery, null);
+    }
 
-                + " INNER JOIN "+ DBHelper.TABLE_TYPE_DEVICE +" as T ON TC."+ DBHelper.TYPE_ID +" = T."+ DBHelper.TYPE_ID
-                ;
+
+
+    /*public Cursor getAllDevice(){
+        String sqlQuery = null;
+        try {
+            sqLiteDatabase = dbHelper.getWritableDatabase();
+            sqlQuery = "select T." + DBHelper.DEV_ID  + " as _id " + " , T." + DBHelper.DEV_NAME  + " , T." + DBHelper.TYPE_ID
+                               + " , TD." + DBHelper.TYPE_NAME + " , CV." + DBHelper.CH_ID + " , CV." + DBHelper.CH_VALUE
+                    + " from "+ DBHelper.DEVICE +" as T "
+                    + " INNER JOIN " + DBHelper.TABLE_TYPE_DEVICE + " as TD ON TD." + DBHelper.TYPE_ID + " = T."+ DBHelper.TYPE_ID
+                    + " INNER JOIN " + DBHelper.CHARACTERISTICS_VALUE + " as CV ON CV." + DBHelper.DEV_ID + " = T." + DBHelper.DEV_ID;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return sqLiteDatabase.rawQuery(sqlQuery, null);
     }*/

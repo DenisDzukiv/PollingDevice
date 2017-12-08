@@ -17,6 +17,7 @@ import android.widget.SimpleCursorAdapter;
 
 import androidproject.pollingdevice.Service.ServiceDevice;
 import androidproject.pollingdevice.activity.DeviceActivity;
+import androidproject.pollingdevice.activity.QuizActivity;
 import androidproject.pollingdevice.dataBase.DB;
 import androidproject.pollingdevice.dataBase.DBHelper;
 
@@ -27,30 +28,26 @@ public class MainActivity extends AppCompatActivity {
     SimpleCursorAdapter scAdapter;
     Cursor cursor;
     ServiceDevice serviceDevice;
-    DB db;
+    DBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lvMain = (ListView) findViewById(R.id.lvMain);
-       /* serviceDevice = new ServiceDevice(this);
-        serviceDevice.dbOpen();
-        cursor = */
-         db = new DB(this);
-         db.dbOpen();
-        //db.drop_database();
-        cursor = db.getType();
+        dbHelper = new DBHelper(this);
+        serviceDevice = new ServiceDevice(this, dbHelper);
+        cursor = serviceDevice.getAllDevice();
         logCursor(cursor);
+        startManagingCursor(cursor); // сам закрывает курсор
 
-        startManagingCursor(cursor);
-        String[] from = new String[] {DBHelper.ID, DBHelper.TYPE_NAME};
+        String[] from = new String[] {DBHelper.ID, DBHelper.DEV_NAME};
         int[] to = new int[] {R.id.tvType, R.id.tvText};
         scAdapter = new SimpleCursorAdapter(this, R.layout.item, cursor, from, to);
-        lvMain = (ListView) findViewById(R.id.lvMain);
+        serviceDevice.serviceDbClose(); // закрытие БД , делать только после использования курсора
         lvMain.setAdapter(scAdapter);
         registerForContextMenu(lvMain);
-        db.dbClose();
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -97,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.addDevice:
                 Intent intent = new Intent(MainActivity.this, DeviceActivity.class);
                 startActivity(intent);
+            case R.id.quiz:
+                Intent intentQuiz = new Intent(MainActivity.this, QuizActivity.class);
+                startActivity(intentQuiz);
         }
 
 

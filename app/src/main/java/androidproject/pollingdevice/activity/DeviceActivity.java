@@ -9,17 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -41,6 +37,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
     EditText etName;
     TextView tv;
     DB db;
+    DBHelper dbHelper;
     Cursor cursor, cursorCharacteristics, cursorBit, cursorDevice;
     SimpleCursorAdapter scAdapter, scAdapterBit;
     Spinner spType, spBit;
@@ -59,26 +56,30 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
 
         btnAdd = (Button) findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(this);
-
         spType = (Spinner) findViewById(R.id.spinner);
         spBit = (Spinner) findViewById(R.id.spBit);
-        db = new DB(this);
-        db.dbOpen();
+
+        dbHelper = new DBHelper(this);
+        db = new DB(this, dbHelper);
+
         cursor = db.getType();
+        startManagingCursor(cursor);
         String[] from = new String[]{DBHelper.TYPE_NAME, DBHelper.ID};
         int[] to = new int[]{R.id.text, R.id.id};
         scAdapter = new SimpleCursorAdapter(this, R.layout.item_type_spinner, cursor, from, to );
         scAdapter.setDropDownViewResource(R.layout.item_type_spinner);
         spType.setAdapter(scAdapter);
+        registerForContextMenu(spType);
 
         cursorBit = db.getBit();
+        startManagingCursor(cursorBit);
         logCursor(cursorBit);
         String[] fromBit = new String[]{DBHelper.CHBIT_NAME, DBHelper.ID};
         int[] toBit = new int[]{R.id.textBit, R.id.idBit};
         scAdapterBit = new SimpleCursorAdapter(this, R.layout.item_bit, cursorBit, fromBit, toBit);
         spBit.setAdapter(scAdapterBit);
         spBit.setSelection(2);
-        Log.d(LOG_TAG, "2 = " );
+        registerForContextMenu(spBit);
         spType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -145,7 +146,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         Characteristics characteristics;
         List<Characteristics> characteristicsList = new ArrayList<>();
         Device device = new Device();
-        ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this);
+        ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this, dbHelper);
 
         etName = (EditText) findViewById(R.id.etName);
         device.setDevName(etName.getText().toString());
@@ -153,13 +154,13 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         spType = (Spinner) findViewById(R.id.spinner);
         device.setTypeId(spType.getSelectedItemId());
 
-        if( nameBit.length() != 0) {
+        if( nameBit != null) {
             characteristics = new Characteristics();
             characteristics.setChId(chIdBit);
             characteristics.setChValue(bitName);
             characteristicsList.add(characteristics);
         }
-        Log.d(LOG_TAG, "bitName = " + bitName.length());
+
         for(EditTextDevice ett:param){
                 characteristics = new Characteristics();
                 characteristics.setChId(ett.getId());

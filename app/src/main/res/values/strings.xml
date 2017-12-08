@@ -2,5 +2,6 @@
     <string name="app_name">PollingDevice</string>
     <string name="action_settings">Settings</string>
     <string name="addDevice">Добавить устройство</string>
+    <string name="quiz">Опрос </string>
     <string name="DeviceName">Наименование устройства</string>
 </resources>

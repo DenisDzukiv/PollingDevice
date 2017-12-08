@@ -22,6 +22,9 @@
         <activity android:name=".activity.DeviceActivity"
             android:label="@string/addDevice">
         </activity>
+        <activity android:name=".activity.QuizActivity"
+            android:label="@string/quiz">
+        </activity>
     </application>
 
 </manifest>
