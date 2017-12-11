@@ -4,4 +4,7 @@
     <string name="addDevice">Добавить устройство</string>
     <string name="quiz">Опрос </string>
     <string name="DeviceName">Наименование устройства</string>
+    <string name="box">Опрос</string>
+    <string name="delDevice">Удалить</string>
+
 </resources>

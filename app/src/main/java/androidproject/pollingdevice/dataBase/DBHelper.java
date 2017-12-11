@@ -100,6 +100,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 + " FOREIGN KEY(" + TYPE_ID + ") REFERENCES TYPE_DEVICE(" + TYPE_ID + "),"
                 + " FOREIGN KEY(" + CH_ID + ") REFERENCES CHARACTERISTICS(" + CH_ID + ")"
                 + ");");
+
         for (int i = 0; i < typeCharacter.length; i++) {
             contentValues.clear();
             contentValues.put(TYPE_ID, typeCharacter[i]);

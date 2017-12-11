@@ -28,8 +28,8 @@ import androidproject.pollingdevice.Validation.Validation;
 import androidproject.pollingdevice.View.EditTextDevice;
 import androidproject.pollingdevice.dataBase.DB;
 import androidproject.pollingdevice.dataBase.DBHelper;
-import androidproject.pollingdevice.model.Characteristics;
 import androidproject.pollingdevice.model.Device;
+import androidproject.pollingdevice.model.DeviceCharacteristicsValue;
 
 
 public class DeviceActivity extends AppCompatActivity implements View.OnClickListener {
@@ -80,6 +80,9 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         spBit.setAdapter(scAdapterBit);
         spBit.setSelection(2);
         registerForContextMenu(spBit);
+
+
+
         spType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
@@ -143,8 +146,8 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        Characteristics characteristics;
-        List<Characteristics> characteristicsList = new ArrayList<>();
+        DeviceCharacteristicsValue characteristics;
+        List<DeviceCharacteristicsValue> characteristicsList = new ArrayList<>();
         Device device = new Device();
         ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this, dbHelper);
 
@@ -155,14 +158,14 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         device.setTypeId(spType.getSelectedItemId());
 
         if( nameBit != null) {
-            characteristics = new Characteristics();
+            characteristics = new DeviceCharacteristicsValue();
             characteristics.setChId(chIdBit);
             characteristics.setChValue(bitName);
             characteristicsList.add(characteristics);
         }
 
         for(EditTextDevice ett:param){
-                characteristics = new Characteristics();
+                characteristics = new DeviceCharacteristicsValue();
                 characteristics.setChId(ett.getId());
                 characteristics.setChValue(ett.getText().toString());
                 characteristicsList.add(characteristics);

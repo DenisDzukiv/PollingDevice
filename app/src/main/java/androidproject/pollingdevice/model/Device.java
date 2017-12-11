@@ -6,15 +6,19 @@ public class Device {
     private long devId;
     private String devName;
     private long typeId;
-    private List<Characteristics> characteristicsList;
+    private TypeDevice typeDevice;
+    private List<DeviceCharacteristicsValue> characteristicsList;
+    private boolean box;
 
     public Device(){}
 
-    public Device(long devId, String devName, long typeId, List<Characteristics> characteristicsList){
+    public Device(long devId, String devName, long typeId, List<DeviceCharacteristicsValue> characteristicsList, TypeDevice typeDevice, boolean box){
         this.devId = devId;
         this.devName = devName;
         this.typeId = typeId;
         this.characteristicsList = characteristicsList;
+        this.typeDevice = typeDevice;
+        this.box = box;
     }
 
     public long getDevId() {
@@ -41,12 +45,28 @@ public class Device {
         this.typeId = typeId;
     }
 
-    public List<Characteristics> getCharacteristicsList() {
+    public List<DeviceCharacteristicsValue> getCharacteristicsList() {
         return characteristicsList;
     }
 
-    public void setCharacteristicsList(List<Characteristics> characteristicsList) {
+    public void setCharacteristicsList(List<DeviceCharacteristicsValue> characteristicsList) {
         this.characteristicsList = characteristicsList;
+    }
+
+    public TypeDevice getTypeDevice() {
+        return typeDevice;
+    }
+
+    public void setTypeDevice(TypeDevice typeDevice) {
+        this.typeDevice = typeDevice;
+    }
+
+    public boolean getBox() {
+        return box;
+    }
+
+    public void setBox(boolean box) {
+        this.box = box;
     }
 
     @Override

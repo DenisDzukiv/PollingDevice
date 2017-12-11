@@ -5,13 +5,13 @@ package androidproject.pollingdevice.model;
 public class Characteristics {
 
     private long chId;
-    private String chValue;
+    private String chName;
 
     public Characteristics(){}
 
-    public Characteristics(long chId, String chValue){
+    public Characteristics(long chId, String chName){
         this.chId = chId;
-        this.chValue = chValue;
+        this.chName = chName;
     }
 
     public long getChId() {
@@ -22,16 +22,11 @@ public class Characteristics {
         this.chId = chId;
     }
 
-    public String getChValue() {
-        return chValue;
+    public String getChName() {
+        return chName;
     }
 
-    public void setChValue(String chValue) {
-        this.chValue = chValue;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
+    public void setChName(String chName) {
+        this.chName = chName;
     }
 }
