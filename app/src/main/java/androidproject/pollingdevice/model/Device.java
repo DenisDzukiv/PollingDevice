@@ -1,8 +1,9 @@
 package androidproject.pollingdevice.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Device {
+public class Device implements Serializable {
     private long devId;
     private String devName;
     private long typeId;

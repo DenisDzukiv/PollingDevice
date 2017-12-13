@@ -154,9 +154,6 @@ public class ServiceDevice implements DaoDevice{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        finally {
-            sqLiteDatabase.close();
-        }
         return dev;
     }
 
@@ -164,14 +161,17 @@ public class ServiceDevice implements DaoDevice{
         List<String> dev_id = new ArrayList<>();
         try {
             sqLiteDatabase = dbHelper.getWritableDatabase();
+            sqLiteDatabase.beginTransaction();
             for(Device d: deviceList){
                 dev_id.add(String.valueOf(d.getDevId()));
             }
             sqLiteDatabase.delete(DBHelper.DEVICE, DBHelper.DEV_ID + " = ?" , dev_id.toArray(new String[dev_id.size()]) );
             sqLiteDatabase.delete(DBHelper.CHARACTERISTICS_VALUE, DBHelper.DEV_ID + " = ? ", dev_id.toArray(new String[dev_id.size()]) );
-
+            sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally{
+            sqLiteDatabase.endTransaction();
         }
     }
 

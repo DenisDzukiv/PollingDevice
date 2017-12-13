@@ -11,7 +11,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     final String LOG_TAG = "myLogs";
     int[] typeId = {1, 2, 3};
-    String[] typeName = {"DEVICETCP", "DEVICEUSB", "DEVICECOM"};
+    String[] typeName = {"deviceTCP", "deviceUSB", "deviceCOM"};
 
     int[] CHARACTERISTICSId = {1, 2, 3, 4, 5, 6, 7, 8};
     String[] CHARACTERISTICSName = {"адрес сервера", "порт", "идентификатор производителя", "идентификатор продукта", "скорость опроса", "бит четности", "databit", "stopbit"};

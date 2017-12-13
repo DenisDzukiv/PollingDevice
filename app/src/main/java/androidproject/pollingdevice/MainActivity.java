@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -28,10 +30,11 @@ import androidproject.pollingdevice.model.Device;
 
 import android.widget.AdapterView.OnItemSelectedListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     final String LOG_TAG = "myLogs";
     ListView lvMain;
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     List<Device> deviceList = new ArrayList<>();
     DeviceAdapter deviceAdapter;
+    Button btnQuiz, btnDelDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +65,12 @@ public class MainActivity extends AppCompatActivity {
         deviceAdapter = new DeviceAdapter(this, deviceList);
         lvMain = (ListView) findViewById(R.id.lvMain);
         lvMain.setAdapter(deviceAdapter);
+
+        btnQuiz = (Button) findViewById(R.id.quiz);
+        btnQuiz.setOnClickListener(this);
+
+        btnDelDevice = (Button) findViewById(R.id.delDevice);
+        btnDelDevice.setOnClickListener(this);
 
 
         /*cursor = serviceDevice.getAllDevice();
@@ -103,6 +113,50 @@ public class MainActivity extends AppCompatActivity {
         });*/
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.quiz:
+                if(connectDevice()) {
+                    if (quizDevice()) {
+                      // Device device1 = new Device();
+                        intent = new Intent(MainActivity.this, QuizActivity.class);
+                        intent.putExtra(QuizActivity.DEVICE ,deviceAdapter.gettBox());
+
+                        /*
+                        intent = new Intent(MainActivity.this, QuizActivity.class);
+                        for (Device dev : deviceAdapter.gettBox()) {
+                            if (dev.getBox()){
+                                intent.putExtra(QuizActivity.DEVICE ,dev);
+//                                device1 = dev;
+
+                            }
+                        }*/
+                        //Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+
+                        /*intent = new Intent(MainActivity.this, QuizActivity.class);
+                        intent.putExtra(QuizActivity.DEVICE , device1);*/
+                        //Log.d("myLog", "in " + String.valueOf(device1.getDevName()));
+                        //intent.putExtra(QuizActivity.DEVICE , deviceAdapter.gettBox());
+                        //intent.putExtra("username", "xtasdf");
+                        startActivity(intent);
+                    } else
+                        Toast.makeText(this, "При опросе устройств произошла ошибка", Toast.LENGTH_LONG).show();
+                }
+                else Toast.makeText(this, "При подключении к устройству произошла ошибка", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.delDevice:
+                String result1 = "Удаленные устройства:";
+                for (Device p : deviceAdapter.gettBox()) {
+//                    if (p.getBox())
+                        result1 += "\n" + p.getDevName();
+                }
+                Toast.makeText(this, result1, Toast.LENGTH_LONG).show();
+                //serviceDevice.deleteDevice(deviceAdapter.gettBox());
+                break;
+        }
+    }
+
     // выводим информацию о корзине
     public void showResult(View v) {
         String result = "Товары в корзине:";
@@ -110,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
             if (p.getBox())
                 result += "\n" + p.getDevName();
         }
-
         Toast.makeText(this, result, Toast.LENGTH_LONG).show();
     }
 
@@ -158,10 +211,15 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("username", "xtasdf");
                 startActivity(intent);
                 break;
-
         }
-
-
         return super.onOptionsItemSelected(item);
+    }
+
+    //
+    public Boolean connectDevice(){
+        return true;
+    }
+    public Boolean quizDevice() {
+        return true;
     }
 }

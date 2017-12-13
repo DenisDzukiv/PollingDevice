@@ -11,7 +11,10 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"
+        tools:ignore="MissingConstraints">
 
         <ListView
             android:id="@+id/lvMain"
@@ -21,15 +24,22 @@
 
         </ListView>
 
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|left"
             android:layout_marginTop="5dp"
-            android:onClick="showResult"
-            android:text="@string/box"></Button>
+            android:text="@string/box"
+            android:id="@+id/quiz"></Button>
 
-
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_marginTop="-50dp"
+            android:text="@string/delDevice"
+            android:id="@+id/delDevice"/>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
