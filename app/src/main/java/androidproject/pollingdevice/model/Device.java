@@ -10,6 +10,7 @@ public class Device implements Serializable {
     private TypeDevice typeDevice;
     private List<DeviceCharacteristicsValue> characteristicsList;
     private boolean box;
+    private int image;
 
     public Device(){}
 
@@ -68,6 +69,15 @@ public class Device implements Serializable {
 
     public void setBox(boolean box) {
         this.box = box;
+    }
+
+
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
     }
 
     @Override

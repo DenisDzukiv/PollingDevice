@@ -78,7 +78,6 @@ public class QuizActivity extends AppCompatActivity implements  View.OnClickList
         btnLoad = (Button) findViewById(R.id.load);
         btnLoad.setOnClickListener(this);
 
-        //Device device = (Device) getIntent().getSerializableExtra(DEVICE);
         ArrayList<Device> deviceList = (ArrayList<Device>) getIntent().getSerializableExtra(DEVICE);
         devQuizList = new ArrayList<>();
         //формирование параметров опроса
@@ -92,7 +91,7 @@ public class QuizActivity extends AppCompatActivity implements  View.OnClickList
                     devQuizList.add(d.getDevName() + "DeviceUSB" + "_val" + i);
                 }
             } else if (d.getTypeDevice().getTypeId() == typeCOM) {
-                //создаю потом для фомриования с задержкой
+                //создаю поток для фомриования с задержкой
                 threadDeviceCom = new GenerateDeviceCom(d.getDevName());
                 threadDeviceCom.start();
                 try {

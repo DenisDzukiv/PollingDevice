@@ -48,6 +48,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
     EditTextDevice et;
     final long chIdBit = 6;
     String bitName, nameBit;
+    public static final String DEVICE = "device";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,6 +59,8 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         btnAdd.setOnClickListener(this);
         spType = (Spinner) findViewById(R.id.spinner);
         spBit = (Spinner) findViewById(R.id.spBit);
+        etName = (EditText) findViewById(R.id.etName);
+
 
         dbHelper = new DBHelper(this);
         db = new DB(this, dbHelper);
@@ -69,6 +72,16 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         scAdapter = new SimpleCursorAdapter(this, R.layout.item_type_spinner, cursor, from, to );
         scAdapter.setDropDownViewResource(R.layout.item_type_spinner);
         spType.setAdapter(scAdapter);
+        //редактирование
+        //////////////
+        final Device device = (Device) getIntent().getSerializableExtra(DEVICE);
+
+
+        if (device.getTypeDevice().getTypeName() != null) {
+            etName.setText(device.getDevName());
+            spType.setSelection((int) device.getTypeDevice().getTypeId());
+        }
+        ///////
         registerForContextMenu(spType);
 
         cursorBit = db.getBit();
@@ -78,17 +91,16 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         int[] toBit = new int[]{R.id.textBit, R.id.idBit};
         scAdapterBit = new SimpleCursorAdapter(this, R.layout.item_bit, cursorBit, fromBit, toBit);
         spBit.setAdapter(scAdapterBit);
+
         spBit.setSelection(2);
         registerForContextMenu(spBit);
-
-
 
         spType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
                 cursorCharacteristics = db.getCharacteristics(spType.getSelectedItemId());
-                createEditTextView(cursorCharacteristics);
+                createEditTextView(cursorCharacteristics, device);
                 cursorCharacteristics.close();
             }
 
@@ -111,7 +123,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    void createEditTextView(Cursor cursor) {
+    void createEditTextView(Cursor cursor, Device device) {
         if (cursor != null) {
             linearLayoutEditText = (LinearLayout) findViewById(R.id.EditText);
             linearLayoutEditText.removeAllViews();
@@ -129,6 +141,10 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
                     characteristicsId.add(cursor.getInt(idIndex));
                     if(cursor.getInt(idIndex) == chIdBit) {
                         spBit.setVisibility(View.VISIBLE);
+
+                        /*for (DeviceCharacteristicsValue cv: device.getCharacteristicsList()){
+                            if(cv.getChId() == chIdBit) spBit.setSelection((int) cv.getChValue());
+                        }*/
                         nameBit = bitName;
                     }
                     else {
@@ -151,7 +167,7 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         Device device = new Device();
         ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this, dbHelper);
 
-        etName = (EditText) findViewById(R.id.etName);
+        //etName = (EditText) findViewById(R.id.etName);
         device.setDevName(etName.getText().toString());
 
         spType = (Spinner) findViewById(R.id.spinner);

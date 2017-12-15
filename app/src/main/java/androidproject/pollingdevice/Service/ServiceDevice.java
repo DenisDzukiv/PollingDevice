@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidproject.pollingdevice.Dao.DaoDevice;
+import androidproject.pollingdevice.R;
 import androidproject.pollingdevice.dataBase.DBHelper;
 import androidproject.pollingdevice.model.DeviceCharacteristicsValue;
 import androidproject.pollingdevice.model.Device;
@@ -19,8 +20,8 @@ import androidproject.pollingdevice.model.TypeDevice;
 
 public class ServiceDevice implements DaoDevice{
 
-    private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "mydb";
+    /*private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "mydb";*/
     private DBHelper dbHelper;
     private final Context mCtx;
     private SQLiteDatabase sqLiteDatabase;
@@ -136,6 +137,7 @@ public class ServiceDevice implements DaoDevice{
 
                         device.setTypeDevice(typeDevice);
                         device.setBox(false);
+                        device.setImage(R.drawable.arrow1);
                         dev.add(device);
                     } while (cursor.moveToNext());
                 } else Log.d(LOG_TAG, "Cursor is null");

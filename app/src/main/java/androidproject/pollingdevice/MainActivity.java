@@ -3,6 +3,7 @@ package androidproject.pollingdevice;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -36,7 +38,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    final String LOG_TAG = "myLogs";
+    static final String LOG_TAG = "myLogs";
     ListView lvMain;
     SimpleCursorAdapter scAdapter;
     Cursor cursor;
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<Device> deviceList = new ArrayList<>();
     DeviceAdapter deviceAdapter;
     Button btnQuiz, btnDelDevice;
+    Image img;
+    static Device deviceEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnDelDevice = (Button) findViewById(R.id.delDevice);
         btnDelDevice.setOnClickListener(this);
 
-
         /*cursor = serviceDevice.getAllDevice();
         logCursor(cursor);
         startManagingCursor(cursor); // сам закрывает курсор
@@ -84,16 +87,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lvMain.setAdapter(scAdapter);
         registerForContextMenu(lvMain);*/
 
-        /*lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View itemClicked, int position,
                                     long id) {
 
-                textDevice = (TextView) findViewById(R.id.tvText);
-                Toast.makeText(getApplicationContext(),  position ,
+
+                String result1 = "Удаленные устройства:";
+                /*for (Device p : deviceAdapter.gettBox()) {
+//                    if (p.getBox())
+                    result1 += "\n" + p.getDevName();
+                }*/
+               // Toast.makeText(this, result1, Toast.LENGTH_LONG).show();
+                Log.d(LOG_TAG, "lvMain.setOnItemClickListener");
+                Toast.makeText(getApplicationContext(),  "toast" ,
                         Toast.LENGTH_SHORT).show();
             }
-        });*/
+        });
 
 
 
@@ -117,28 +127,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.quiz:
+                // Подключение произошло успешно
                 if(connectDevice()) {
                     if (quizDevice()) {
-                      // Device device1 = new Device();
+                        //опрос произошел успешно
                         intent = new Intent(MainActivity.this, QuizActivity.class);
                         intent.putExtra(QuizActivity.DEVICE ,deviceAdapter.gettBox());
-
-                        /*
-                        intent = new Intent(MainActivity.this, QuizActivity.class);
-                        for (Device dev : deviceAdapter.gettBox()) {
-                            if (dev.getBox()){
-                                intent.putExtra(QuizActivity.DEVICE ,dev);
-//                                device1 = dev;
-
-                            }
-                        }*/
-                        //Toast.makeText(this, result, Toast.LENGTH_LONG).show();
-
-                        /*intent = new Intent(MainActivity.this, QuizActivity.class);
-                        intent.putExtra(QuizActivity.DEVICE , device1);*/
-                        //Log.d("myLog", "in " + String.valueOf(device1.getDevName()));
-                        //intent.putExtra(QuizActivity.DEVICE , deviceAdapter.gettBox());
-                        //intent.putExtra("username", "xtasdf");
                         startActivity(intent);
                     } else
                         Toast.makeText(this, "При опросе устройств произошла ошибка", Toast.LENGTH_LONG).show();
@@ -152,19 +146,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         result1 += "\n" + p.getDevName();
                 }
                 Toast.makeText(this, result1, Toast.LENGTH_LONG).show();
-                //serviceDevice.deleteDevice(deviceAdapter.gettBox());
                 break;
         }
     }
 
     // выводим информацию о корзине
-    public void showResult(View v) {
-        String result = "Товары в корзине:";
-        for (Device p : deviceAdapter.gettBox()) {
-            if (p.getBox())
-                result += "\n" + p.getDevName();
-        }
-        Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+    public static void editDevice(Device device) {
+        //deviceAdapter.gettDev();
+        deviceEdit = device;
+        Log.d(LOG_TAG, device.getDevName());
+
+    }
+
+    private void goDeviceActivity(){
+        intent = new Intent(MainActivity.this, DeviceActivity.class);
+        intent.putExtra(DeviceActivity.DEVICE, deviceEdit);
+        startActivity(intent);
     }
 
 
@@ -215,11 +212,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    //
     public Boolean connectDevice(){
         return true;
     }
     public Boolean quizDevice() {
         return true;
     }
+
+
+
+
+
 }
