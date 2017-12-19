@@ -24,11 +24,14 @@ import android.widget.Toast;
 
 import androidproject.pollingdevice.Adapters.DeviceAdapter;
 import androidproject.pollingdevice.Service.ServiceDevice;
+import androidproject.pollingdevice.Service.ServiceType;
+import androidproject.pollingdevice.activity.DevActivity;
 import androidproject.pollingdevice.activity.DeviceActivity;
 import androidproject.pollingdevice.activity.QuizActivity;
 import androidproject.pollingdevice.dataBase.DB;
 import androidproject.pollingdevice.dataBase.DBHelper;
 import androidproject.pollingdevice.model.Device;
+import androidproject.pollingdevice.model.TypeDevice;
 
 import android.widget.AdapterView.OnItemSelectedListener;
 
@@ -36,23 +39,26 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements DeviceAdapter.CalbackDevice,  View.OnClickListener   {
 
     static final String LOG_TAG = "myLogs";
     ListView lvMain;
     SimpleCursorAdapter scAdapter;
     Cursor cursor;
-    ServiceDevice serviceDevice;
+
     DBHelper dbHelper;
     TextView textDevice;
     Intent intent;
     String[] names;
 
+    ServiceDevice serviceDevice;
+    ServiceType serviceType;
     List<Device> deviceList = new ArrayList<>();
     DeviceAdapter deviceAdapter;
     Button btnQuiz, btnDelDevice;
     Image img;
-    static Device deviceEdit;
+    List<TypeDevice> typeDeviceList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +72,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dbHelper = new DBHelper(this);
         serviceDevice = new ServiceDevice(this, dbHelper);
         deviceList = serviceDevice.devices();
+
+        /*serviceType = new ServiceType(this, dbHelper);
+        typeDeviceList = serviceType.allTypeDevices();*/
+
+
         deviceAdapter = new DeviceAdapter(this, deviceList);
+        deviceAdapter.setCallback(this);
         lvMain = (ListView) findViewById(R.id.lvMain);
         lvMain.setAdapter(deviceAdapter);
 
@@ -150,22 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    // выводим информацию о корзине
-    public static void editDevice(Device device) {
-        //deviceAdapter.gettDev();
-        deviceEdit = device;
-        Log.d(LOG_TAG, device.getDevName());
-
-    }
-
-    private void goDeviceActivity(){
-        intent = new Intent(MainActivity.this, DeviceActivity.class);
-        intent.putExtra(DeviceActivity.DEVICE, deviceEdit);
-        startActivity(intent);
-    }
-
-
-
     void logCursor(Cursor cursor){
         Log.d(LOG_TAG, "----- logCursor2  ----");
         if(cursor != null) {
@@ -200,13 +196,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //onBackPressed();
                 break;
             case R.id.addDevice:
-                intent = new Intent(MainActivity.this, DeviceActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.quiz:
-                intent = new Intent(MainActivity.this, QuizActivity.class);
-                intent.putExtra("username", "xtasdf");
-                startActivity(intent);
+                callbackCall(new Device());
+               /* intent = new Intent(MainActivity.this, DeviceActivity.class);
+                startActivity(intent);*/
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -220,7 +212,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
-
+    @Override
+    public void callbackCall(Device device) {
+        intent = new Intent(MainActivity.this, DeviceActivity.class);
+        intent.putExtra(DeviceActivity.DEVICE, device);
+        startActivity(intent);
+    }
 }

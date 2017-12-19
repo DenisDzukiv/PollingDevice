@@ -99,10 +99,6 @@ public class QuizActivity extends AppCompatActivity implements  View.OnClickList
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                /*for (int i = 1; i < 13; i++) {
-                    devQuizList.add(d.getDevName() + "DeviceCOM" + "_val" + i);
-                }*/
-
             }
         }
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, devQuizList);

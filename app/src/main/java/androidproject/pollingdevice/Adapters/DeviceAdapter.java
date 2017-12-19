@@ -22,12 +22,15 @@ import androidproject.pollingdevice.activity.DeviceActivity;
 import androidproject.pollingdevice.model.Device;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
+
+
 public class DeviceAdapter extends BaseAdapter{
     Context ctx;
     LayoutInflater layoutInflater;
     List<Device> objects;
     ImageView image;
     CheckBox checkBox;
+    CalbackDevice callback;
 
     public DeviceAdapter(Context context, List<Device> devices){
         ctx = context;
@@ -104,8 +107,15 @@ public class DeviceAdapter extends BaseAdapter{
     View.OnClickListener clickImage = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            MainActivity.editDevice(getDevice((int) view.getTag()));
+            callback.callbackCall(getDevice((int) view.getTag()));
         }
     };
 
+    public void setCallback (CalbackDevice callback){
+        this.callback = callback;
+    }
+
+    public interface CalbackDevice{
+        void callbackCall(Device device);
+    }
 }

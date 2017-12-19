@@ -1,8 +1,9 @@
 package androidproject.pollingdevice.model;
 
 
+import java.io.Serializable;
 
-public class DeviceCharacteristicsValue {
+public class DeviceCharacteristicsValue implements Serializable {
 
     private long chId;
     private String chValue;

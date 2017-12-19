@@ -3,20 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="androidproject.pollingdevice.MainActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/addDevice"
         android:orderInCategory="1"
         android:title="@string/addDevice"
         app:showAsAction="never" />
-
-    <item
-        android:id="@+id/quiz"
-        android:orderInCategory="2"
-        android:title="@string/quiz"
-        app:showAsAction="never" />
-
 </menu>

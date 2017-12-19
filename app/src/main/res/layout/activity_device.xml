@@ -48,6 +48,12 @@
             android:id="@+id/btnAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add"></Button>
+            android:text="@string/add"></Button>
+        <Button
+            android:id="@+id/btnEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit"
+            android:visibility="gone"></Button>
     </LinearLayout>
 </LinearLayout>
