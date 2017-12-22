@@ -44,7 +44,6 @@ public class ServiceDevice implements DaoDevice {
             sqLiteDatabase.beginTransaction();
             long lastId;
             contentValuesDev = new ContentValues();
-            contentValuesDev.clear();
             contentValuesDev.put(DBHelper.DEV_NAME, device.getDevName());
             contentValuesDev.put(DBHelper.TYPE_ID, device.getTypeId());
             lastId = sqLiteDatabase.insert(DBHelper.DEVICE, null, contentValuesDev);
@@ -67,7 +66,35 @@ public class ServiceDevice implements DaoDevice {
     }
 
     public void update(Device device) {
+        try {
         sqLiteDatabase = dbHelper.getWritableDatabase();
+
+            Log.d(LOG_TAG, "dev_id" + String.valueOf(device.getDevId()));
+        sqLiteDatabase.beginTransaction();
+        contentValuesDev = new ContentValues();
+        contentValuesDev.put(DBHelper.DEV_NAME, device.getDevName());
+        contentValuesDev.put(DBHelper.TYPE_ID, device.getTypeId());
+        sqLiteDatabase.update(DBHelper.DEVICE, contentValuesDev, DBHelper.DEV_ID + " = ?" , new String[] {String.valueOf(device.getDevId())});
+
+        sqLiteDatabase.delete(DBHelper.CHARACTERISTICS_VALUE, DBHelper.DEV_ID + " = ?" , new String[] {String.valueOf(device.getDevId())});
+            Log.d(LOG_TAG, "21");
+            contentCharacteristics = new ContentValues();
+            contentCharacteristics.clear();
+
+        for (DeviceCharacteristicsValue ct : device.getCharacteristicsList()) {
+            contentCharacteristics.put(DBHelper.DEV_ID, device.getDevId());
+            contentCharacteristics.put(DBHelper.CH_ID, ct.getChId());
+            contentCharacteristics.put(DBHelper.CH_VALUE, ct.getChValue());
+            sqLiteDatabase.insert(DBHelper.CHARACTERISTICS_VALUE, null, contentCharacteristics);
+        }
+            Log.d(LOG_TAG, "dev_id" + String.valueOf(device.getDevId()));
+        sqLiteDatabase.setTransactionSuccessful();
+        }catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
+            serviceDbClose();
+        }
     }
 
     public Cursor getCharValue() {
@@ -119,7 +146,7 @@ public class ServiceDevice implements DaoDevice {
                                         DeviceCharacteristicsValue deviceCharacteristicsValue = new DeviceCharacteristicsValue();
                                         deviceCharacteristicsValue.setChId(cursor1.getLong(chId));
                                         deviceCharacteristicsValue.setChValue(cursor1.getString(chValue));
-                                        Log.d(LOG_TAG, "name = " + cursor.getString(nameIndex) + "param = " + cursor1.getLong(chId));
+                                        //Log.d(LOG_TAG, "name = " + cursor.getString(nameIndex) + "param = " + cursor1.getLong(chId));
                                         deviceCharacteristicsValueList.add(deviceCharacteristicsValue);
                                     } while (cursor1.moveToNext());
                                     cursor1.close();

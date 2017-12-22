@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements DeviceAdapter.Cal
                     result1 += "\n" + p.getDevName();
                 }*/
                // Toast.makeText(this, result1, Toast.LENGTH_LONG).show();
-                Log.d(LOG_TAG, "lvMain.setOnItemClickListener");
+             //   Log.d(LOG_TAG, "lvMain.setOnItemClickListener");
                 Toast.makeText(getApplicationContext(),  "toast" ,
                         Toast.LENGTH_SHORT).show();
             }

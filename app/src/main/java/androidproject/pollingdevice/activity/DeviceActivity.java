@@ -36,7 +36,7 @@ import androidproject.pollingdevice.model.DeviceCharacteristicsValue;
 public class DeviceActivity extends AppCompatActivity implements View.OnClickListener {
     Button btnAdd, btnEdit;
     EditText etName;
-    TextView tv;
+    TextView tv, tvDevId;
     DB db;
     DBHelper dbHelper;
     Cursor cursor, cursorCharacteristics, cursorBit, cursorDevice;
@@ -67,7 +67,9 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
         spBit = (Spinner) findViewById(R.id.spBit);
         etName = (EditText) findViewById(R.id.etName);
 
+        tvDevId = (TextView) findViewById(R.id.devId);
 
+        //TODO Передалать доступ к БД, и выводом данных как для Device  в MainActivity
         dbHelper = new DBHelper(this);
         db = new DB(this, dbHelper);
 
@@ -83,8 +85,9 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
 
 
         if ((device.getDevName() != null)) {
+           // Log.d("mylog", String.valueOf(device.getDevId()));
+            tvDevId.setText(String.valueOf(device.getDevId()));
             etName.setText(device.getDevName());
-
             spType.setSelection(((int) device.getTypeDevice().getTypeId()) - 1);
             btnAdd.setVisibility(View.GONE);
             btnEdit.setVisibility(View.VISIBLE);
@@ -150,10 +153,10 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
 
                         if ((device.getDevName() != null)) {
                             for (DeviceCharacteristicsValue dv : device.getCharacteristicsList()) {
-                                if(dv.getChId() == chIdBit) spBit.setSelection(((int) dv.getChId()));
+                                if (dv.getChId() == chIdBit)
+                                    spBit.setSelection(((int) dv.getChId()));
                             }
-                        }
-                        else spBit.setSelection(2);
+                        } else spBit.setSelection(2);
                         nameBit = bitName;
                     } else {
                         et = new EditTextDevice(DeviceActivity.this);
@@ -179,45 +182,49 @@ public class DeviceActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         DeviceCharacteristicsValue characteristics;
         List<DeviceCharacteristicsValue> characteristicsList = new ArrayList<>();
-        Device device = new Device();
+        Device deviceAdd = new Device();
         ServiceDevice serviceDevice = new ServiceDevice(DeviceActivity.this, dbHelper);
 
 
-                //etName = (EditText) findViewById(R.id.etName);
-                device.setDevName(etName.getText().toString());
+        //etName = (EditText) findViewById(R.id.etName);
+        deviceAdd.setDevName(etName.getText().toString());
 
-                spType = (Spinner) findViewById(R.id.spinner);
-                device.setTypeId(spType.getSelectedItemId());
 
-                if (nameBit != null) {
-                    characteristics = new DeviceCharacteristicsValue();
-                    characteristics.setChId(chIdBit);
-                    characteristics.setChValue(bitName);
-                    characteristicsList.add(characteristics);
-                }
+        spType = (Spinner) findViewById(R.id.spinner);
+        deviceAdd.setTypeId(spType.getSelectedItemId());
 
-                for (EditTextDevice ett : param) {
-                    characteristics = new DeviceCharacteristicsValue();
-                    characteristics.setChId(ett.getId());
-                    characteristics.setChValue(ett.getText().toString());
-                    characteristicsList.add(characteristics);
-                }
-                device.setCharacteristicsList(characteristicsList);
-                if (!Validation.validDevice(device)) {
-                    Toast.makeText(getBaseContext(), "Данные введены не корректно!", Toast.LENGTH_SHORT).show();
-                } else {
-                    switch (v.getId()) {
-                        case R.id.btnAdd:
-                    serviceDevice.save(device);
-                        case R.id.btnEdit:
+        if (nameBit != null) {
+            characteristics = new DeviceCharacteristicsValue();
+            characteristics.setChId(chIdBit);
+            characteristics.setChValue(bitName);
+            characteristicsList.add(characteristics);
+        }
 
+        for (EditTextDevice ett : param) {
+            characteristics = new DeviceCharacteristicsValue();
+            characteristics.setChId(ett.getId());
+            characteristics.setChValue(ett.getText().toString());
+            characteristicsList.add(characteristics);
+        }
+        deviceAdd.setCharacteristicsList(characteristicsList);
+        if (!Validation.validDevice(deviceAdd)) {
+            Toast.makeText(getBaseContext(), "Данные введены не корректно!", Toast.LENGTH_SHORT).show();
+        } else {
+            switch (v.getId()) {
+                case R.id.btnAdd:
+                    serviceDevice.save(deviceAdd);
+                    Toast.makeText(getBaseContext(), "Устройство добавлено", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.btnEdit:
+                    deviceAdd.setDevId(Long.parseLong(String.valueOf(tvDevId.getText())));
+                    serviceDevice.update(deviceAdd);
+                    break;
                     //cursor = serviceDevice.getCharValue();
                     //cursor.close();
-                    Toast.makeText(getBaseContext(), "Устройство добавлено", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(DeviceActivity.this, MainActivity.class);
-                    startActivity(intent);
-                }
+            }
 
+            Intent intent = new Intent(DeviceActivity.this, MainActivity.class);
+            startActivity(intent);
 
         }
 
